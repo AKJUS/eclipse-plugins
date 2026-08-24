@@ -328,6 +328,7 @@ public class InstallJob extends Job {
 
 	private boolean unzip(File archiveFile, IPath destRelativePath) throws IOException {
 
+		File destRoot = PacksStorage.getFileObject(destRelativePath.toString()).getCanonicalFile();
 		fOut.println("Unzipping \"" + archiveFile + "\"...");
 
 		boolean result = true;
@@ -346,8 +347,11 @@ public class InstallJob extends Job {
 
 					String fileName = zipEntry.getName();
 
-					IPath path = destRelativePath.append(fileName);
-					File outFile = PacksStorage.getFileObject(path.toString());
+					File outFile = new File(destRoot, fileName).getCanonicalFile();
+					if (!outFile.toPath().startsWith(destRoot.toPath())) {
+						throw new IOException("Zip entry outside target dir, aborting extraction: " + fileName);
+					}
+
 					if (!outFile.getParentFile().exists()) {
 						outFile.getParentFile().mkdirs();
 					}

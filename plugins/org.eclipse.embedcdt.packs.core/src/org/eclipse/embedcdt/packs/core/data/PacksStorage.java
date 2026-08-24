@@ -82,6 +82,18 @@ public class PacksStorage {
 		return file; // Cannot return null
 	}
 
+	/**
+	 * @since 3.2
+	 */
+	public static File getCacheFolder() throws IOException {
+		IPath path = getFolderPath().append(CACHE_FOLDER);
+		File file = path.toFile();
+		if (file == null) {
+			throw new IOException(CACHE_FOLDER + " File object null.");
+		}
+		return file; // Cannot return null
+	}
+
 	public static File getPackageFileObject(String vendor, String packageName, String version, String name)
 			throws IOException {
 

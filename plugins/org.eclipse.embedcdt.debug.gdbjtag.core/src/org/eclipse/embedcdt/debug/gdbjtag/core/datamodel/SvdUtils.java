@@ -437,12 +437,16 @@ public class SvdUtils {
 				// This is the signature of ZIP files.
 				try (ZipInputStream zipInput = new ZipInputStream(new FileInputStream(file))) {
 					// Get the zipped file list entry
+					File destRoot = PacksStorage.getCacheFolder().getCanonicalFile();
 					ZipEntry zipEntry = zipInput.getNextEntry();
 					while (zipEntry != null) {
 						if (!zipEntry.isDirectory()) {
 							String fileName = zipEntry.getName();
 
-							File outFile = PacksStorage.getCachedFileObject(fileName);
+							File outFile = PacksStorage.getCachedFileObject(fileName).getCanonicalFile();
+							if (!outFile.toPath().startsWith(destRoot.toPath())) {
+								throw new IOException("Zip entry outside target dir, aborting extraction: " + fileName);
+							}
 							if (!outFile.getParentFile().exists()) {
 								outFile.getParentFile().mkdirs();
 							}
